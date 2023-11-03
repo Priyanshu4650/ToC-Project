@@ -37,32 +37,28 @@ int calculateExp(string input) {
 	vector<int> containing_integers;
 	int n = input.size();
 	int temp = 0;
-	int i = 0;
 
-	while(i < n) {
+	for(int i=0;i<n;i++) {
 		cout << "Now " << input[i] << " " << i << endl;
 		if(isdigit(input[i])) {
 			temp = temp * 10 + (input[i] - '0');
 			cout << "Curr number " << temp << endl;
-			i += 1;
 		}
-		else if(input[i] == ' ' && temp != 0) {
-			cout << "Pushed " << temp << endl;
-			containing_integers.push_back(temp);
-			temp = 0;
-			i += 1;
-		}	
 		else if(input[i] == ' ') {
-			i += 1;
-		}
+			if(temp != 0) {
+				cout << "Pushed " << temp << endl;
+				containing_integers.push_back(temp);
+				temp = 0;
+			}
+		}	
 		else {
 			if(containing_integers.size() < 2) {
 				cout << "Stack underflow" << endl;
 				return -2;
 			}
-			int num1 = containing_integers[containing_integers.size() - 1];
-			containing_integers.pop_back();
 			int num2 = containing_integers[containing_integers.size() - 1];
+			containing_integers.pop_back();
+			int num1 = containing_integers[containing_integers.size() - 1];
 			containing_integers.pop_back();
 
 			cout << num1 << " " << num2 << endl;
@@ -74,12 +70,12 @@ int calculateExp(string input) {
 			if(newNum == -1) {
 				cout << "Result se pehle" << endl;
 				return -1;
-				i += 1;
 			}
 			
 			containing_integers.push_back(newNum);
 		}
 
+		cout << "Current stack" << endl;
 		for(int i=0;i<containing_integers.size();i++) {
 			cout <<containing_integers[i] << " ";
 		}
@@ -104,7 +100,10 @@ int calculateExp(string input) {
 
 int main() {
 	string input;
-	cin >> input;
+    cout << "Enter the RPN expression: ";
+    getline(cin, input);
+
+	cout << "Input is : " << input << " of size " << input.size() << endl;
 	
 	int res = calculateExp(input);
 
