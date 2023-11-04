@@ -12,7 +12,7 @@ You are given an expression in the RPN form and your task is to evaluate the RPN
 #include<bits/stdc++.h>
 using namespace std;
 
-int result(int n1, int n2, char sign) {
+double result(double n1, double n2, char sign) {
 	switch (sign) {
 		case '+' :
 			return n1 + n2;
@@ -24,76 +24,64 @@ int result(int n1, int n2, char sign) {
 			if(n2 != 0) {
 				return n1 / n2;
 			}
-			return -1;
+			return -3.0;
 		case '^' :
 			return pow(n1, n2);
 		default :
 			cout << "Sign not available for now" << endl;
-			return 0;
+			return 0.0;
 	}
 }
 
-int calculateExp(string input) {
-	vector<int> containing_integers;
+double calculateExp(string input, vector<char>& operators) {
+	stack<double> containing_integers;
 	int n = input.size();
-	int temp = 0;
+	int i = 0;
 
-	for(int i=0;i<n;i++) {
-		cout << "Now " << input[i] << " " << i << endl;
-		if(isdigit(input[i])) {
-			temp = temp * 10 + (input[i] - '0');
-			cout << "Curr number " << temp << endl;
-		}
-		else if(input[i] == ' ') {
-			if(temp != 0) {
-				cout << "Pushed " << temp << endl;
-				containing_integers.push_back(temp);
-				temp = 0;
-			}
-		}	
-		else {
+	while(i < n) {
+		if(count(operators.begin(), operators.end(), input[i]) != 0) {
 			if(containing_integers.size() < 2) {
-				cout << "Stack underflow" << endl;
-				return -2;
+				return -2.0;
 			}
-			int num2 = containing_integers[containing_integers.size() - 1];
-			containing_integers.pop_back();
-			int num1 = containing_integers[containing_integers.size() - 1];
-			containing_integers.pop_back();
+			int n2 = containing_integers.top();
+			containing_integers.pop();
+			int n1 = containing_integers.top();
+			containing_integers.pop();
 
-			cout << num1 << " " << num2 << endl;
+			int newNum = result(n1, n2, input[i]);
 
-			int newNum = result(num1, num2, input[i]);
-
-			cout << "Result of the operation " << newNum << endl;
-
-			if(newNum == -1) {
-				cout << "Result se pehle" << endl;
-				return -1;
+			if(newNum == -2.0) {
+				return newNum;
 			}
-			
-			containing_integers.push_back(newNum);
+
+			containing_integers.push(newNum);
+			i += 1;
 		}
 
-		cout << "Current stack" << endl;
-		for(int i=0;i<containing_integers.size();i++) {
-			cout <<containing_integers[i] << " ";
+		else if(input[i] == ' ') {
+			i += 1;
 		}
-		cout << endl;
-	}
 
-	for(int i=0;i<containing_integers.size();i++) {
-		cout <<containing_integers[i] << " ";
+		else {
+			string s = "";
+			while(input[i] != ' ' && i < input.size()) {
+				s.push_back(input[i]);
+				i += 1;
+			}
+
+			double num = stod(s);
+			s = "";
+			containing_integers.push(num);
+		}
 	}
-	cout << endl;
 
 	if(containing_integers.size() != 1) {
 		cout << "final output se pehle " << endl;
-		return -1;
+		return -1.0;
 	}
 
-	int ans = containing_integers[containing_integers.size() - 1];
-	containing_integers.pop_back();
+	double ans = containing_integers.top();
+	containing_integers.pop();
 	
 	return ans;
 }
@@ -104,19 +92,25 @@ int main() {
     getline(cin, input);
 
 	cout << "Input is : " << input << " of size " << input.size() << endl;
-	
-	int res = calculateExp(input);
 
-	if(res == -1) {
+	vector<char> operators = {'+', '-', '*', '/', '^'};
+	
+	double res = calculateExp(input, operators);
+
+	if(res == -1.0) {
 		cout << "Error Occured" << endl;
 	}
 
-	else if(res == -2) {
+	else if(res == -2.0) {
 		cout << "Stack underflow improper notation" << endl;
 	}
 
+	else if(res == -3.0) {
+		cout << "Division by zero error" << endl;
+	}
+
 	else {
-		cout << "Result is : " << res << endl;
+		cout << "Result is: " << fixed << setprecision(6) << res << endl;
 	}
 
 	return 0;
